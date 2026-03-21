@@ -46,9 +46,9 @@ export default function CameraPage({
   }, []);
 
   return (
-    <main className="flex-1 flex flex-col bg-black h-dvh">
+    <main className="flex flex-col h-[100dvh] bg-black overflow-hidden">
       {/* Header */}
-      <div className="flex items-center justify-between px-4 py-2 bg-black/80 backdrop-blur-sm z-10">
+      <div className="flex-shrink-0 flex items-center justify-between px-4 py-2 bg-black/80 backdrop-blur-sm z-10">
         <span className="text-sm text-gold-light/60">{guestName}</span>
         <span className="font-[family-name:var(--font-playfair)] text-gold text-sm font-semibold">
           Wedding Camera
@@ -61,7 +61,7 @@ export default function CameraPage({
         </a>
       </div>
 
-      {/* Camera viewfinder */}
+      {/* Camera viewfinder — fills remaining space */}
       <Camera
         filterCSS={activeFilter.css}
         onStream={handleStream}
@@ -69,7 +69,7 @@ export default function CameraPage({
       />
 
       {/* Filter strip */}
-      <div className="bg-black/90 backdrop-blur-sm">
+      <div className="flex-shrink-0 bg-black/90 backdrop-blur-sm">
         <FilterStrip
           activeFilter={activeFilter}
           onSelect={setActiveFilter}
@@ -78,7 +78,7 @@ export default function CameraPage({
       </div>
 
       {/* Capture controls */}
-      <div className="bg-black">
+      <div className="flex-shrink-0 bg-black pb-[env(safe-area-inset-bottom)]">
         <PhotoCapture
           videoRef={videoRef}
           activeFilter={activeFilter}

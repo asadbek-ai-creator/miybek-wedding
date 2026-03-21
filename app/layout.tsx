@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Playfair_Display, Inter } from "next/font/google";
 import "./globals.css";
 
@@ -13,6 +13,13 @@ const inter = Inter({
   subsets: ["latin"],
   display: "swap",
 });
+
+export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 1,
+  viewportFit: "cover",
+  themeColor: "#0A0A0A",
+};
 
 export const metadata: Metadata = {
   title: "Wedding Camera | Capture Your Moments",
@@ -33,9 +40,6 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" className={`${playfair.variable} ${inter.variable}`}>
-      <head>
-        <meta name="theme-color" content="#0A0A0A" />
-      </head>
       <body className="min-h-dvh flex flex-col bg-dark text-white antialiased">
         {children}
       </body>
