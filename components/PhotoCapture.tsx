@@ -59,14 +59,14 @@ export default function PhotoCapture({
   const queueRef = useRef<PendingUpload[]>([]);
   const activeTasksRef = useRef<Map<string, UploadTask>>(new Map());
 
-  // Sync queueRef inside setUploads to avoid race with useEffect timing
+  // Update ref synchronously so processQueue always sees latest data.
+  // setUploads triggers React re-render (may be batched — that's fine for UI).
   const updateUploads = useCallback(
     (updater: PendingUpload[] | ((prev: PendingUpload[]) => PendingUpload[])) => {
-      setUploads((prev) => {
-        const next = typeof updater === "function" ? updater(prev) : updater;
-        queueRef.current = next;
-        return next;
-      });
+      const next =
+        typeof updater === "function" ? updater(queueRef.current) : updater;
+      queueRef.current = next;
+      setUploads(next);
     },
     []
   );
@@ -81,7 +81,7 @@ export default function PhotoCapture({
     if (activeCountRef.current >= MAX_CONCURRENT) return;
 
     const next = current.find(
-      (u) => u.status === "uploading" && u.blob && u.progress === 0
+      (u) => u.status === "uploading" && u.blob && u.progress <= 1
     );
     if (!next) return;
 
@@ -128,7 +128,7 @@ export default function PhotoCapture({
           updateUploads((prev) =>
             prev.map((u) =>
               u.id === photoId
-                ? { ...u, blob: smallerBlob, progress: 0, retryCount: u.retryCount + 1 }
+                ? { ...u, blob: smallerBlob, progress: 1, retryCount: u.retryCount + 1 }
                 : u
             )
           );
@@ -154,8 +154,11 @@ export default function PhotoCapture({
     task.on(
       "state_changed",
       (snapshot) => {
-        const pct = Math.round(
-          (snapshot.bytesTransferred / snapshot.totalBytes) * 100
+        const pct = Math.max(
+          1,
+          Math.round(
+            (snapshot.bytesTransferred / snapshot.totalBytes) * 100
+          )
         );
         updateUploads((prev) =>
           prev.map((u) => (u.id === photoId ? { ...u, progress: pct } : u))
@@ -254,7 +257,7 @@ export default function PhotoCapture({
     (id: string) => {
       updateUploads((prev) =>
         prev.map((u) =>
-          u.id === id ? { ...u, status: "uploading", progress: 0 } : u
+          u.id === id ? { ...u, status: "uploading", progress: 1 } : u
         )
       );
       setTimeout(() => processQueue(), 0);
@@ -347,11 +350,10 @@ export default function PhotoCapture({
       updateUploads((prev) =>
         prev.map((u) =>
           u.id === photoId
-            ? { ...u, status: "uploading", blob, galleryThumbBlob, blurDataURL }
+            ? { ...u, status: "uploading", progress: 1, blob, galleryThumbBlob, blurDataURL }
             : u
         )
       );
-      // processQueue synchronously — queueRef is already up to date
       processQueue();
     } catch {
       updateUploads((prev) =>
