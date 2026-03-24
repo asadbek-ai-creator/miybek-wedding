@@ -30,6 +30,7 @@ export default function CameraPage({
       ? sessionStorage.getItem("guestUID") || ""
       : ""
   );
+  const [photosTaken, setPhotosTaken] = useState(0);
 
   // Wait for auth to be ready (handles page refresh / cold start)
   useEffect(() => {
@@ -82,16 +83,30 @@ export default function CameraPage({
   return (
     <main className="flex flex-col h-[100dvh] bg-black overflow-hidden">
       {/* Header */}
-      <div className="flex-shrink-0 flex items-center justify-between px-4 py-2 bg-black/80 backdrop-blur-sm z-10">
-        <span className="text-sm text-gold-light/60">{guestName}</span>
-        <span className="font-[family-name:var(--font-playfair)] text-gold text-sm font-semibold">
+      <div className="flex-shrink-0 flex items-center justify-between px-4 py-3 bg-black/40 backdrop-blur-sm border-b border-gold/30 z-10">
+        <a
+          href={`/event/${eventId}`}
+          className="flex items-center gap-1 text-sm text-gold border border-gold/50 bg-white/10 rounded-full px-4 py-1.5 hover:bg-white/20 active:scale-95 transition-all duration-200"
+        >
+          <span>&larr;</span>
+          <span>{guestName}</span>
+        </a>
+        <span
+          className="font-[family-name:var(--font-playfair)] text-gold text-lg font-semibold"
+          style={{ textShadow: "0 1px 4px rgba(0,0,0,0.6)" }}
+        >
           Той Камерасы
         </span>
         <a
           href={`/event/${eventId}/gallery`}
-          className="text-sm text-gold hover:text-gold-light transition-colors"
+          className="relative flex items-center gap-1.5 text-sm text-gold border border-gold/50 bg-white/10 rounded-full px-4 py-1.5 hover:bg-white/20 active:scale-95 transition-all duration-200"
         >
-          Галерея
+          <span>Галерея</span>
+          {photosTaken > 0 && (
+            <span className="flex items-center justify-center min-w-[18px] h-[18px] px-1 text-[10px] font-bold bg-gold text-black rounded-full">
+              {photosTaken}
+            </span>
+          )}
         </a>
       </div>
 
@@ -119,6 +134,7 @@ export default function CameraPage({
           eventId={eventId}
           guestName={guestName}
           guestUID={guestUID}
+          onPhotoSaved={() => setPhotosTaken((n) => n + 1)}
         />
       </div>
     </main>

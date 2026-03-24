@@ -34,6 +34,7 @@ interface PhotoCaptureProps {
   eventId: string;
   guestName: string;
   guestUID: string;
+  onPhotoSaved?: () => void;
 }
 
 async function ensureAuth(): Promise<void> {
@@ -48,6 +49,7 @@ export default function PhotoCapture({
   eventId,
   guestName,
   guestUID,
+  onPhotoSaved,
 }: PhotoCaptureProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const isCapturingRef = useRef(false);
@@ -238,6 +240,7 @@ export default function PhotoCapture({
               : u
           )
         );
+        onPhotoSaved?.();
 
         // Auto-remove after 3s
         setTimeout(() => {
@@ -252,7 +255,7 @@ export default function PhotoCapture({
     if (activeCountRef.current < MAX_CONCURRENT) {
       processQueue();
     }
-  }, [eventId, guestName, guestUID, updateUploads]);
+  }, [eventId, guestName, guestUID, updateUploads, onPhotoSaved]);
 
   const retryUpload = useCallback(
     (id: string) => {
