@@ -39,9 +39,22 @@ export default function Gallery({ eventId }: GalleryProps) {
     );
 
     const unsub = onSnapshot(q, (snapshot) => {
-      const newPhotos = snapshot.docs.map(
+      const rawPhotos = snapshot.docs.map(
         (doc) => ({ id: doc.id, ...doc.data() } as Photo)
       );
+
+      // Deduplicate: if two photos from the same guest have timestamps
+      // within 2 seconds, keep only the first (safety net for any legacy duplicates)
+      const seen = new Map<string, number>();
+      const newPhotos = rawPhotos.filter((p) => {
+        const key = `${p.guestName}:${p.imageURL}`;
+        const prev = seen.get(key);
+        if (prev !== undefined && Math.abs(prev - (p.createdAt || 0)) < 2000) {
+          return false;
+        }
+        seen.set(key, p.createdAt || 0);
+        return true;
+      });
       setPhotos(newPhotos);
       setHasMore(snapshot.docs.length === pageSize);
       setLoading(false);

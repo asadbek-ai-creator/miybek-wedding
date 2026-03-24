@@ -2,7 +2,6 @@
 
 import { useRef, useState, useCallback } from "react";
 import { ref, uploadBytesResumable, getDownloadURL } from "firebase/storage";
-import { collection, addDoc } from "firebase/firestore";
 import { doc, setDoc, increment } from "firebase/firestore";
 import { getFirebaseStorage, getFirebaseDb } from "@/lib/firebase";
 import { compressImage, generateId, generateThumbnail, generateBlurDataURL } from "@/lib/utils";
@@ -193,8 +192,9 @@ export default function GalleryUpload({
         await uploadBytesResumable(thumbRef, galleryThumbBlob);
         const thumbnailURL = await getDownloadURL(thumbRef);
 
-        await addDoc(
-          collection(getFirebaseDb(), "events", eventId, "photos"),
+        // Use setDoc with photoId — idempotent: overwrites same doc if called twice
+        await setDoc(
+          doc(getFirebaseDb(), "events", eventId, "photos", photoId),
           {
             eventId,
             imageURL,

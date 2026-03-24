@@ -3,7 +3,6 @@
 import { useRef, useState, useCallback, useEffect } from "react";
 import { ref, uploadBytesResumable, getDownloadURL } from "firebase/storage";
 import type { UploadTask } from "firebase/storage";
-import { collection, addDoc } from "firebase/firestore";
 import { doc, setDoc, increment } from "firebase/firestore";
 import { getFirebaseStorage, getFirebaseDb, getFirebaseAuth } from "@/lib/firebase";
 import { signInAnonymously } from "firebase/auth";
@@ -198,8 +197,10 @@ export default function PhotoCapture({
             thumbnailURL = await getDownloadURL(thumbRef);
           }
 
-          await addDoc(
-            collection(getFirebaseDb(), "events", eventId, "photos"),
+          // Use setDoc with photoId — idempotent: even if called twice,
+          // it overwrites the same document instead of creating duplicates
+          await setDoc(
+            doc(getFirebaseDb(), "events", eventId, "photos", photoId),
             {
               eventId,
               imageURL,
@@ -362,11 +363,11 @@ export default function PhotoCapture({
         )
       );
     } finally {
-      // Release capture lock after a short cooldown to prevent double-tap
+      // Release capture lock after cooldown to prevent double-tap
       setTimeout(() => {
         isCapturingRef.current = false;
         setCapturing(false);
-      }, 800);
+      }, 2000);
     }
   }, [videoRef, activeFilter, processQueue, updateUploads]);
 
