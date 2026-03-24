@@ -64,3 +64,39 @@ body {
 .filter-strip::-webkit-scrollbar {
   display: none;
 }
+
+/* Entry page animations */
+@keyframes entryFadeIn {
+  from { opacity: 0; transform: translateY(-10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes dividerGrow {
+  from { width: 0; }
+  to { width: 80px; }
+}
+
+@keyframes ornamentSway {
+  0%, 100% { transform: rotate(0deg); }
+  50% { transform: rotate(3deg); }
+}
+
+.entry-content {
+  animation: entryFadeIn 0.6s ease both;
+}
+
+.entry-divider {
+  height: 1px;
+  background: #D4AF37;
+  opacity: 0.4;
+  animation: dividerGrow 0.8s ease 0.3s both;
+}
+
+.entry-ornament {
+  animation: ornamentSway 60s ease-in-out infinite;
+}
+
+/* Placeholder color for entry input */
+.entry-content input::placeholder {
+  color: #666;
+}
