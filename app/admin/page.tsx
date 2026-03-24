@@ -234,7 +234,7 @@ export default function AdminPage() {
       {/* Event list */}
       {events.length === 0 ? (
         <div className="text-center py-20 text-white/30">
-          <p>Ҳәлиге той жоқ. Жаңа той жасаң!</p>
+          <p>Еле той жоқ. Жаңа той жаратың!</p>
         </div>
       ) : (
         <div className="space-y-3">
@@ -250,7 +250,7 @@ export default function AdminPage() {
               </p>
               <div className="flex gap-4 mt-2 text-xs text-white/30">
                 <span>{event.photoCount || 0} суўрет</span>
-                <span>{event.guestCount || 0} меҳман</span>
+                <span>{event.guestCount || 0} мийман</span>
               </div>
             </button>
           ))}

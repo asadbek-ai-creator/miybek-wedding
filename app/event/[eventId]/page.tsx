@@ -117,7 +117,7 @@ export default function EventEntryPage({
 
       router.push(`/event/${eventId}/camera`);
     } catch {
-      setError("Қосылыў мүмкин болмады. Қайта урыныў.");
+      setError("Қосылып болмады. Қайта урыныў.");
       setLoading(false);
     }
   };
@@ -172,7 +172,7 @@ export default function EventEntryPage({
                 borderRadius: "4px",
               }}
             >
-              ТОЙ МӘРЕСИМИ
+              БАХТ ТОЙЫ
             </span>
           </div>
 

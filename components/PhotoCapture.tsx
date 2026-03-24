@@ -51,7 +51,9 @@ export default function PhotoCapture({
   guestUID,
 }: PhotoCaptureProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
+  const isCapturingRef = useRef(false);
   const [showFlash, setShowFlash] = useState(false);
+  const [capturing, setCapturing] = useState(false);
   const [uploads, setUploads] = useState<PendingUpload[]>([]);
   const activeCountRef = useRef(0);
   const queueRef = useRef<PendingUpload[]>([]);
@@ -265,9 +267,18 @@ export default function PhotoCapture({
   }, [updateUploads]);
 
   const capturePhoto = useCallback(async () => {
+    // Prevent double capture from rapid taps or StrictMode
+    if (isCapturingRef.current) return;
+    isCapturingRef.current = true;
+    setCapturing(true);
+
     const video = videoRef.current;
     const canvas = canvasRef.current;
-    if (!video || !canvas) return;
+    if (!video || !canvas) {
+      isCapturingRef.current = false;
+      setCapturing(false);
+      return;
+    }
 
     // Ensure auth is ready before any Firebase operation
     await ensureAuth();
@@ -348,6 +359,12 @@ export default function PhotoCapture({
           u.id === photoId ? { ...u, status: "failed" } : u
         )
       );
+    } finally {
+      // Release capture lock after a short cooldown to prevent double-tap
+      setTimeout(() => {
+        isCapturingRef.current = false;
+        setCapturing(false);
+      }, 800);
     }
   }, [videoRef, activeFilter, processQueue, updateUploads]);
 
@@ -430,12 +447,21 @@ export default function PhotoCapture({
           defaultFilter={activeFilter}
         />
 
-        {/* Capture button — never disabled */}
+        {/* Capture button */}
         <button
           onClick={capturePhoto}
-          className="w-18 h-18 rounded-full border-4 border-gold flex items-center justify-center hover:scale-105 active:scale-95 transition-transform"
+          disabled={capturing}
+          className={`w-18 h-18 rounded-full border-4 flex items-center justify-center transition-all ${
+            capturing
+              ? "border-gold/40 scale-95"
+              : "border-gold hover:scale-105 active:scale-95"
+          }`}
         >
-          <div className="w-14 h-14 rounded-full bg-gold" />
+          <div
+            className={`w-14 h-14 rounded-full transition-colors ${
+              capturing ? "bg-gold/40" : "bg-gold"
+            }`}
+          />
         </button>
 
         {/* Upload count indicator */}

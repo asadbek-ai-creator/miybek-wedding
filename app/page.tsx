@@ -31,7 +31,7 @@ export default function Home() {
         Той Камерасы
       </h1>
       <p className="text-gold-light/80 text-lg max-w-md mb-12">
-        Ҳәр бир сәтти сақлаң — фильтрлер менен суўретке түсиң ҳәм тирик галереяда бөлисиң.
+        Ҳәр бир дәмди сәтти — өзгеше сүўретлер түсириң ҳәм жанлы галереяда бөлисиң.
       </p>
 
       <div className="flex flex-col gap-4 w-full max-w-xs">
@@ -39,10 +39,10 @@ export default function Home() {
           href="/admin"
           className="bg-gold text-dark font-semibold py-3 px-6 rounded-full text-center hover:bg-gold-light transition-colors"
         >
-          Хожайын кириси
+          Админ кириси
         </Link>
         <p className="text-sm text-white/40 mt-4">
-          Меҳманлар: суўретке түсиў ушын столыңыздағы QR кодты сканерлең!
+          Mийманлар: суўретке түсиў ушын столыңыздағы QR кодты сканерлең!
         </p>
       </div>
     </main>

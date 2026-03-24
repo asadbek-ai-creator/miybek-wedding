@@ -175,16 +175,16 @@ export default function AdminEventPage({
           <p className="text-2xl font-bold text-gold">
             {event?.guestCount || 0}
           </p>
-          <p className="text-white/40 text-sm">Меҳманлар</p>
+          <p className="text-white/40 text-sm">Mийманлар</p>
         </div>
       </div>
 
       {/* QR Code */}
       <div className="mb-8 p-6 bg-dark-surface rounded-xl border border-dark-border">
         <h2 className="text-gold font-semibold text-center mb-4">
-          Меҳман QR коды
+          Mийман QR коды
         </h2>
-        <QRGenerator url={eventUrl} />
+        <QRGenerator url={eventUrl} eventName={event?.name || ""} />
       </div>
 
       {/* Actions */}
@@ -224,7 +224,7 @@ export default function AdminEventPage({
                     disabled={deletingPhoto === photo.id}
                     className="text-red-400 hover:text-red-300 text-xs"
                   >
-                    {deletingPhoto === photo.id ? "..." : "Жойыў"}
+                    {deletingPhoto === photo.id ? "..." : "Өшириў"}
                   </button>
                 </div>
                 <p className="absolute bottom-0 left-0 right-0 bg-black/60 text-white/60 text-[10px] px-1 py-0.5 truncate rounded-b">
@@ -243,12 +243,12 @@ export default function AdminEventPage({
             onClick={() => setShowDeleteConfirm(true)}
             className="text-red-400/60 text-sm hover:text-red-400 transition-colors"
           >
-            Тойды жойыў
+            Тойды өшириў
           </button>
         ) : (
           <div className="bg-red-900/20 border border-red-800/30 rounded-xl p-4">
             <p className="text-red-400 text-sm mb-3">
-              Бул той ҳәм барлық суўретлерди мәңгиге жояды. Буны қайтарыў мүмкин емес.
+              Бул той ҳәм барлық суўретлерди мәңгиге өшириў. Буны қайтарыў мүмкин емес.
             </p>
             <div className="flex gap-3">
               <button
@@ -256,7 +256,7 @@ export default function AdminEventPage({
                 disabled={deleting}
                 className="bg-red-600 text-white text-sm px-4 py-2 rounded-full hover:bg-red-500 transition-colors disabled:opacity-50"
               >
-                {deleting ? "Жойылып атыр..." : "Аўа, барлығын жойыў"}
+                {deleting ? "Өширилип атыр атыр..." : "Аўа, барлығын өшириў"}
               </button>
               <button
                 onClick={() => setShowDeleteConfirm(false)}

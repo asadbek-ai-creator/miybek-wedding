@@ -22,8 +22,8 @@ export default function CameraPage({
   const [authReady, setAuthReady] = useState(false);
   const [guestName] = useState(() =>
     typeof window !== "undefined"
-      ? sessionStorage.getItem("guestName") || "Меҳман"
-      : "Меҳман"
+      ? sessionStorage.getItem("guestName") || "Мийман"
+      : "Мийман"
   );
   const [guestUID] = useState(() =>
     typeof window !== "undefined"
