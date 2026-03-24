@@ -5,8 +5,9 @@ import { ref, uploadBytesResumable, getDownloadURL } from "firebase/storage";
 import type { UploadTask } from "firebase/storage";
 import { collection, addDoc } from "firebase/firestore";
 import { doc, setDoc, increment } from "firebase/firestore";
-import { getFirebaseStorage, getFirebaseDb } from "@/lib/firebase";
-import { compressImage, generateId } from "@/lib/utils";
+import { getFirebaseStorage, getFirebaseDb, getFirebaseAuth } from "@/lib/firebase";
+import { signInAnonymously } from "firebase/auth";
+import { compressImage, generateId, generateThumbnail, generateBlurDataURL } from "@/lib/utils";
 import type { Filter } from "@/lib/filters";
 import GalleryUpload from "@/components/GalleryUpload";
 
@@ -20,6 +21,8 @@ interface PendingUpload {
   status: "compressing" | "uploading" | "done" | "failed";
   progress: number;
   blob: Blob | null;
+  galleryThumbBlob: Blob | null;
+  blurDataURL: string | null;
   width: number;
   height: number;
   filter: Filter;
@@ -32,6 +35,12 @@ interface PhotoCaptureProps {
   eventId: string;
   guestName: string;
   guestUID: string;
+}
+
+async function ensureAuth(): Promise<void> {
+  const auth = getFirebaseAuth();
+  if (auth.currentUser) return;
+  await signInAnonymously(auth);
 }
 
 export default function PhotoCapture({
@@ -48,10 +57,22 @@ export default function PhotoCapture({
   const queueRef = useRef<PendingUpload[]>([]);
   const activeTasksRef = useRef<Map<string, UploadTask>>(new Map());
 
-  // Update queueRef when uploads change
+  // Sync queueRef inside setUploads to avoid race with useEffect timing
+  const updateUploads = useCallback(
+    (updater: PendingUpload[] | ((prev: PendingUpload[]) => PendingUpload[])) => {
+      setUploads((prev) => {
+        const next = typeof updater === "function" ? updater(prev) : updater;
+        queueRef.current = next;
+        return next;
+      });
+    },
+    []
+  );
+
+  // Pre-warm auth on mount so first upload doesn't stall
   useEffect(() => {
-    queueRef.current = uploads;
-  }, [uploads]);
+    ensureAuth().catch(() => {});
+  }, []);
 
   const processQueue = useCallback(() => {
     const current = queueRef.current;
@@ -102,7 +123,7 @@ export default function PhotoCapture({
           URL.revokeObjectURL(blobUrl);
 
           const smallerBlob = await compressImage(retryCanvas, 0.5, 1280);
-          setUploads((prev) =>
+          updateUploads((prev) =>
             prev.map((u) =>
               u.id === photoId
                 ? { ...u, blob: smallerBlob, progress: 0, retryCount: u.retryCount + 1 }
@@ -111,7 +132,7 @@ export default function PhotoCapture({
           );
           setTimeout(() => processQueue(), 0);
         } catch {
-          setUploads((prev) =>
+          updateUploads((prev) =>
             prev.map((u) =>
               u.id === photoId ? { ...u, status: "failed" } : u
             )
@@ -119,7 +140,7 @@ export default function PhotoCapture({
           processQueue();
         }
       } else {
-        setUploads((prev) =>
+        updateUploads((prev) =>
           prev.map((u) =>
             u.id === photoId ? { ...u, status: "failed" } : u
           )
@@ -134,7 +155,7 @@ export default function PhotoCapture({
         const pct = Math.round(
           (snapshot.bytesTransferred / snapshot.totalBytes) * 100
         );
-        setUploads((prev) =>
+        updateUploads((prev) =>
           prev.map((u) => (u.id === photoId ? { ...u, progress: pct } : u))
         );
       },
@@ -145,7 +166,7 @@ export default function PhotoCapture({
         if (err.code === "storage/canceled") return;
 
         activeCountRef.current--;
-        setUploads((prev) =>
+        updateUploads((prev) =>
           prev.map((u) =>
             u.id === photoId ? { ...u, status: "failed" } : u
           )
@@ -156,14 +177,29 @@ export default function PhotoCapture({
         clearTimeout(timeoutId);
         activeTasksRef.current.delete(photoId);
 
-        // Upload succeeded — save to Firestore
+        // Upload succeeded — upload thumbnail then save to Firestore
         try {
           const imageURL = await getDownloadURL(storageRef);
+
+          // Upload gallery thumbnail if available
+          let thumbnailURL: string | undefined;
+          const entry = queueRef.current.find((u) => u.id === photoId);
+          if (entry?.galleryThumbBlob) {
+            const thumbRef = ref(
+              getFirebaseStorage(),
+              `events/${eventId}/thumbnails/${photoId}.jpg`
+            );
+            await uploadBytesResumable(thumbRef, entry.galleryThumbBlob);
+            thumbnailURL = await getDownloadURL(thumbRef);
+          }
+
           await addDoc(
             collection(getFirebaseDb(), "events", eventId, "photos"),
             {
               eventId,
               imageURL,
+              ...(thumbnailURL && { thumbnailURL }),
+              ...(entry?.blurDataURL && { blurDataURL: entry.blurDataURL }),
               filter: next.filter.id,
               guestName,
               guestUID,
@@ -179,7 +215,7 @@ export default function PhotoCapture({
           );
         } catch {
           activeCountRef.current--;
-          setUploads((prev) =>
+          updateUploads((prev) =>
             prev.map((u) =>
               u.id === photoId ? { ...u, status: "failed" } : u
             )
@@ -189,7 +225,7 @@ export default function PhotoCapture({
         }
 
         activeCountRef.current--;
-        setUploads((prev) =>
+        updateUploads((prev) =>
           prev.map((u) =>
             u.id === photoId
               ? { ...u, status: "done", progress: 100, blob: null }
@@ -199,7 +235,7 @@ export default function PhotoCapture({
 
         // Auto-remove after 3s
         setTimeout(() => {
-          setUploads((prev) => prev.filter((u) => u.id !== photoId));
+          updateUploads((prev) => prev.filter((u) => u.id !== photoId));
         }, 3000);
 
         processQueue();
@@ -210,28 +246,31 @@ export default function PhotoCapture({
     if (activeCountRef.current < MAX_CONCURRENT) {
       processQueue();
     }
-  }, [eventId, guestName, guestUID]);
+  }, [eventId, guestName, guestUID, updateUploads]);
 
   const retryUpload = useCallback(
     (id: string) => {
-      setUploads((prev) =>
+      updateUploads((prev) =>
         prev.map((u) =>
           u.id === id ? { ...u, status: "uploading", progress: 0 } : u
         )
       );
       setTimeout(() => processQueue(), 0);
     },
-    [processQueue]
+    [processQueue, updateUploads]
   );
 
   const dismissUpload = useCallback((id: string) => {
-    setUploads((prev) => prev.filter((u) => u.id !== id));
-  }, []);
+    updateUploads((prev) => prev.filter((u) => u.id !== id));
+  }, [updateUploads]);
 
   const capturePhoto = useCallback(async () => {
     const video = videoRef.current;
     const canvas = canvasRef.current;
     if (!video || !canvas) return;
+
+    // Ensure auth is ready before any Firebase operation
+    await ensureAuth();
 
     // Flash
     setShowFlash(true);
@@ -278,32 +317,39 @@ export default function PhotoCapture({
       status: "compressing",
       progress: 0,
       blob: null,
+      galleryThumbBlob: null,
+      blurDataURL: null,
       width: captureW,
       height: captureH,
       filter,
       retryCount: 0,
     };
-    setUploads((prev) => [entry, ...prev]);
+    updateUploads((prev) => [entry, ...prev]);
 
     // Compress in background (non-blocking — camera is already free)
     try {
-      const blob = await compressImage(canvas, 0.7, 1920);
-      setUploads((prev) =>
+      const [blob, galleryThumbBlob] = await Promise.all([
+        compressImage(canvas, 0.7, 1920),
+        generateThumbnail(canvas, 400, 0.6),
+      ]);
+      const blurDataURL = generateBlurDataURL(canvas);
+      updateUploads((prev) =>
         prev.map((u) =>
           u.id === photoId
-            ? { ...u, status: "uploading", blob }
+            ? { ...u, status: "uploading", blob, galleryThumbBlob, blurDataURL }
             : u
         )
       );
-      setTimeout(() => processQueue(), 0);
+      // processQueue synchronously — queueRef is already up to date
+      processQueue();
     } catch {
-      setUploads((prev) =>
+      updateUploads((prev) =>
         prev.map((u) =>
           u.id === photoId ? { ...u, status: "failed" } : u
         )
       );
     }
-  }, [videoRef, activeFilter, processQueue]);
+  }, [videoRef, activeFilter, processQueue, updateUploads]);
 
   return (
     <>

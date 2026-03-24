@@ -14,10 +14,10 @@ import {
 } from "firebase/firestore";
 import { ref, deleteObject } from "firebase/storage";
 import { getFirebaseAuth, getFirebaseDb, getFirebaseStorage } from "@/lib/firebase";
+import dynamic from "next/dynamic";
 import type { Event, Photo } from "@/lib/types";
-import QRGenerator from "@/components/QRGenerator";
-import JSZip from "jszip";
-import { saveAs } from "file-saver";
+
+const QRGenerator = dynamic(() => import("@/components/QRGenerator"), { ssr: false });
 
 export default function AdminEventPage({
   params,
@@ -77,6 +77,10 @@ export default function AdminEventPage({
     setDownloading(true);
 
     try {
+      const [{ default: JSZip }, { saveAs }] = await Promise.all([
+        import("jszip"),
+        import("file-saver"),
+      ]);
       const zip = new JSZip();
       const folder = zip.folder("wedding-photos")!;
 
@@ -209,9 +213,10 @@ export default function AdminEventPage({
               <div key={photo.id} className="relative group aspect-square">
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img
-                  src={photo.imageURL}
+                  src={photo.thumbnailURL || photo.imageURL}
                   alt={`Photo by ${photo.guestName}`}
                   className="w-full h-full object-cover rounded"
+                  loading="lazy"
                 />
                 <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center rounded">
                   <button

@@ -5,7 +5,7 @@ import { ref, uploadBytesResumable, getDownloadURL } from "firebase/storage";
 import { collection, addDoc } from "firebase/firestore";
 import { doc, setDoc, increment } from "firebase/firestore";
 import { getFirebaseStorage, getFirebaseDb } from "@/lib/firebase";
-import { compressImage, generateId } from "@/lib/utils";
+import { compressImage, generateId, generateThumbnail, generateBlurDataURL } from "@/lib/utils";
 import { filters, type Filter } from "@/lib/filters";
 
 const MAX_CONCURRENT = 2;
@@ -144,7 +144,11 @@ export default function GalleryUpload({
         ctx.drawImage(img, 0, 0, w, h);
         ctx.filter = "none";
 
-        const blob = await compressImage(canvas, quality, maxW);
+        const [blob, galleryThumbBlob] = await Promise.all([
+          compressImage(canvas, quality, maxW),
+          generateThumbnail(canvas, 400, 0.6),
+        ]);
+        const blurDataURL = generateBlurDataURL(canvas);
 
         // Update status to uploading
         setPhotos((prev) =>
@@ -181,11 +185,21 @@ export default function GalleryUpload({
 
         const imageURL = await getDownloadURL(storageRef);
 
+        // Upload gallery thumbnail
+        const thumbRef = ref(
+          getFirebaseStorage(),
+          `events/${eventId}/thumbnails/${photoId}.jpg`
+        );
+        await uploadBytesResumable(thumbRef, galleryThumbBlob);
+        const thumbnailURL = await getDownloadURL(thumbRef);
+
         await addDoc(
           collection(getFirebaseDb(), "events", eventId, "photos"),
           {
             eventId,
             imageURL,
+            thumbnailURL,
+            blurDataURL,
             filter: photo.filter.id,
             guestName,
             guestUID,

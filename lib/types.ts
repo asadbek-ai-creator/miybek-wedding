@@ -15,6 +15,7 @@ export interface Photo {
   eventId: string;
   imageURL: string;
   thumbnailURL?: string;
+  blurDataURL?: string;
   filter: string;
   guestName: string;
   guestUID: string;

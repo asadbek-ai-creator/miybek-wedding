@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect, useRef } from "react";
-import QRCode from "qrcode";
 
 interface QRGeneratorProps {
   url: string;
@@ -13,14 +12,17 @@ export default function QRGenerator({ url, size = 256 }: QRGeneratorProps) {
 
   useEffect(() => {
     if (!canvasRef.current) return;
+    const canvas = canvasRef.current;
 
-    QRCode.toCanvas(canvasRef.current, url, {
-      width: size,
-      margin: 2,
-      color: {
-        dark: "#D4AF37",
-        light: "#0A0A0A",
-      },
+    import("qrcode").then((QRCode) => {
+      QRCode.toCanvas(canvas, url, {
+        width: size,
+        margin: 2,
+        color: {
+          dark: "#D4AF37",
+          light: "#0A0A0A",
+        },
+      });
     });
   }, [url, size]);
 

@@ -80,3 +80,45 @@ export function generateId(): string {
 export function cn(...classes: (string | boolean | undefined | null)[]): string {
   return classes.filter(Boolean).join(" ");
 }
+
+export function generateThumbnail(
+  canvas: HTMLCanvasElement,
+  maxWidth: number = 400,
+  quality: number = 0.6
+): Promise<Blob> {
+  let targetW = canvas.width;
+  let targetH = canvas.height;
+
+  if (targetW > maxWidth) {
+    const scale = maxWidth / targetW;
+    targetW = maxWidth;
+    targetH = Math.round(targetH * scale);
+  }
+
+  const thumbCanvas = document.createElement("canvas");
+  thumbCanvas.width = targetW;
+  thumbCanvas.height = targetH;
+  const ctx = thumbCanvas.getContext("2d")!;
+  ctx.drawImage(canvas, 0, 0, targetW, targetH);
+
+  return new Promise((resolve, reject) => {
+    thumbCanvas.toBlob(
+      (blob) => {
+        if (blob) resolve(blob);
+        else reject(new Error("Failed to generate thumbnail"));
+      },
+      "image/jpeg",
+      quality
+    );
+  });
+}
+
+export function generateBlurDataURL(canvas: HTMLCanvasElement): string {
+  const tiny = document.createElement("canvas");
+  tiny.width = 16;
+  const scale = 16 / canvas.width;
+  tiny.height = Math.round(canvas.height * scale);
+  const ctx = tiny.getContext("2d")!;
+  ctx.drawImage(canvas, 0, 0, tiny.width, tiny.height);
+  return tiny.toDataURL("image/jpeg", 0.3);
+}

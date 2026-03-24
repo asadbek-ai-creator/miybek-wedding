@@ -1,10 +1,14 @@
 "use client";
 
-import { use, useRef, useState, useCallback } from "react";
-import Camera from "@/components/Camera";
-import FilterStrip from "@/components/FilterStrip";
-import PhotoCapture from "@/components/PhotoCapture";
+import { use, useRef, useState, useCallback, useEffect } from "react";
+import dynamic from "next/dynamic";
+import { onAuthStateChanged, signInAnonymously } from "firebase/auth";
+import { getFirebaseAuth } from "@/lib/firebase";
 import { filters, type Filter } from "@/lib/filters";
+
+const Camera = dynamic(() => import("@/components/Camera"), { ssr: false });
+const FilterStrip = dynamic(() => import("@/components/FilterStrip"), { ssr: false });
+const PhotoCapture = dynamic(() => import("@/components/PhotoCapture"), { ssr: false });
 
 export default function CameraPage({
   params,
@@ -15,6 +19,7 @@ export default function CameraPage({
   const videoRef = useRef<HTMLVideoElement | null>(null);
   const [activeFilter, setActiveFilter] = useState<Filter>(filters[0]);
   const [thumbnailSrc, setThumbnailSrc] = useState<string | null>(null);
+  const [authReady, setAuthReady] = useState(false);
   const [guestName] = useState(() =>
     typeof window !== "undefined"
       ? sessionStorage.getItem("guestName") || "Guest"
@@ -25,6 +30,26 @@ export default function CameraPage({
       ? sessionStorage.getItem("guestUID") || ""
       : ""
   );
+
+  // Wait for auth to be ready (handles page refresh / cold start)
+  useEffect(() => {
+    const auth = getFirebaseAuth();
+    const unsub = onAuthStateChanged(auth, async (user) => {
+      if (user) {
+        setAuthReady(true);
+      } else {
+        // No session — re-authenticate anonymously
+        try {
+          await signInAnonymously(auth);
+          setAuthReady(true);
+        } catch {
+          // Auth failed — still allow camera, PhotoCapture will retry
+          setAuthReady(true);
+        }
+      }
+    });
+    return () => unsub();
+  }, []);
 
   const handleStream = useCallback(() => {
     // Generate thumbnail from video for filter previews
@@ -44,6 +69,15 @@ export default function CameraPage({
       }
     }, 500);
   }, []);
+
+  if (!authReady) {
+    return (
+      <main className="flex flex-col h-[100dvh] bg-black items-center justify-center">
+        <div className="w-6 h-6 border-2 border-gold/30 border-t-gold rounded-full animate-spin mb-3" />
+        <span className="text-white/40 text-sm">Connecting...</span>
+      </main>
+    );
+  }
 
   return (
     <main className="flex flex-col h-[100dvh] bg-black overflow-hidden">

@@ -1,15 +1,20 @@
 "use client";
 
 import { useState, useEffect, useRef, useCallback } from "react";
+import dynamic from "next/dynamic";
 import {
   collection,
   query,
   orderBy,
   onSnapshot,
+  limit,
 } from "firebase/firestore";
 import { getFirebaseDb } from "@/lib/firebase";
 import type { Photo } from "@/lib/types";
-import Lightbox from "./Lightbox";
+
+const Lightbox = dynamic(() => import("./Lightbox"), { ssr: false });
+
+const PAGE_SIZE = 20;
 
 interface GalleryProps {
   eventId: string;
@@ -20,12 +25,17 @@ export default function Gallery({ eventId }: GalleryProps) {
   const [loading, setLoading] = useState(true);
   const [selectedIndex, setSelectedIndex] = useState<number | null>(null);
   const [visiblePhotos, setVisiblePhotos] = useState<Set<string>>(new Set());
+  const [pageSize, setPageSize] = useState(PAGE_SIZE);
+  const [hasMore, setHasMore] = useState(true);
   const observerRef = useRef<IntersectionObserver | null>(null);
+  const sentinelRef = useRef<HTMLDivElement | null>(null);
 
+  // Firestore query with pagination
   useEffect(() => {
     const q = query(
       collection(getFirebaseDb(), "events", eventId, "photos"),
-      orderBy("createdAt", "desc")
+      orderBy("createdAt", "desc"),
+      limit(pageSize)
     );
 
     const unsub = onSnapshot(q, (snapshot) => {
@@ -33,11 +43,34 @@ export default function Gallery({ eventId }: GalleryProps) {
         (doc) => ({ id: doc.id, ...doc.data() } as Photo)
       );
       setPhotos(newPhotos);
+      setHasMore(snapshot.docs.length === pageSize);
       setLoading(false);
     });
 
     return () => unsub();
-  }, [eventId]);
+  }, [eventId, pageSize]);
+
+  // "Load more" sentinel observer
+  useEffect(() => {
+    if (!hasMore) return;
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (entries[0].isIntersecting) {
+          setPageSize((prev) => prev + PAGE_SIZE);
+        }
+      },
+      { rootMargin: "400px" }
+    );
+
+    const sentinel = sentinelRef.current;
+    if (sentinel) observer.observe(sentinel);
+
+    return () => {
+      if (sentinel) observer.unobserve(sentinel);
+      observer.disconnect();
+    };
+  }, [hasMore, photos.length]);
 
   // Lazy loading with IntersectionObserver
   const imageRef = useCallback(
@@ -112,12 +145,20 @@ export default function Gallery({ eventId }: GalleryProps) {
             ref={imageRef}
             data-photo-id={photo.id}
             className="aspect-square bg-dark-surface rounded overflow-hidden cursor-pointer hover:opacity-90 transition-opacity"
+            style={
+              photo.blurDataURL
+                ? {
+                    backgroundImage: `url(${photo.blurDataURL})`,
+                    backgroundSize: "cover",
+                  }
+                : undefined
+            }
             onClick={() => setSelectedIndex(index)}
           >
             {visiblePhotos.has(photo.id) ? (
               // eslint-disable-next-line @next/next/no-img-element
               <img
-                src={photo.imageURL}
+                src={photo.thumbnailURL || photo.imageURL}
                 alt={`Photo by ${photo.guestName}`}
                 className="w-full h-full object-cover fade-in"
                 loading="lazy"
@@ -128,6 +169,13 @@ export default function Gallery({ eventId }: GalleryProps) {
           </div>
         ))}
       </div>
+
+      {/* Load more sentinel */}
+      {hasMore && (
+        <div ref={sentinelRef} className="flex justify-center py-4">
+          <div className="w-6 h-6 border-2 border-gold/30 border-t-gold rounded-full animate-spin" />
+        </div>
+      )}
 
       {selectedIndex !== null && (
         <Lightbox
