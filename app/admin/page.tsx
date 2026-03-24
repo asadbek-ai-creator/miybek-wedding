@@ -68,7 +68,7 @@ export default function AdminPage() {
     try {
       await signInWithEmailAndPassword(getFirebaseAuth(), email, password);
     } catch {
-      setLoginError("Invalid email or password");
+      setLoginError("Электрон почта яки пароль қәте");
     }
     setLoginLoading(false);
   };
@@ -111,7 +111,7 @@ export default function AdminPage() {
       <main className="flex-1 flex flex-col items-center justify-center px-4">
         <div className="w-full max-w-sm fade-in">
           <h1 className="font-[family-name:var(--font-playfair)] text-3xl font-bold text-gold text-center mb-8">
-            Host Login
+            Хожайын кириси
           </h1>
 
           <form onSubmit={handleLogin} className="space-y-4">
@@ -119,7 +119,7 @@ export default function AdminPage() {
               type="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              placeholder="Email"
+              placeholder="Электрон почта"
               className="w-full px-4 py-3 rounded-xl bg-dark-surface border border-dark-border text-white placeholder-white/30 focus:outline-none focus:border-gold transition-colors"
               autoFocus
             />
@@ -127,7 +127,7 @@ export default function AdminPage() {
               type="password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              placeholder="Password"
+              placeholder="Пароль"
               className="w-full px-4 py-3 rounded-xl bg-dark-surface border border-dark-border text-white placeholder-white/30 focus:outline-none focus:border-gold transition-colors"
             />
             <button
@@ -135,7 +135,7 @@ export default function AdminPage() {
               disabled={loginLoading}
               className="w-full bg-gold text-dark font-semibold py-3 rounded-full hover:bg-gold-light transition-colors disabled:opacity-50"
             >
-              {loginLoading ? "Signing in..." : "Sign In"}
+              {loginLoading ? "Кирип атыр..." : "Кириў"}
             </button>
           </form>
 
@@ -149,7 +149,7 @@ export default function AdminPage() {
             href="/"
             className="block text-center text-white/40 text-sm mt-6 hover:text-white/60 transition-colors"
           >
-            &larr; Back to home
+            &larr; Бас бетке
           </a>
         </div>
       </main>
@@ -161,20 +161,20 @@ export default function AdminPage() {
     <main className="flex-1 px-4 py-6 max-w-2xl mx-auto w-full">
       <div className="flex items-center justify-between mb-8">
         <h1 className="font-[family-name:var(--font-playfair)] text-2xl font-bold text-gold">
-          My Events
+          Тойларым
         </h1>
         <div className="flex gap-3">
           <button
             onClick={() => setShowCreate(!showCreate)}
             className="bg-gold text-dark text-sm font-semibold px-4 py-2 rounded-full hover:bg-gold-light transition-colors"
           >
-            + New Event
+            + Жаңа той
           </button>
           <button
             onClick={() => signOut(getFirebaseAuth())}
             className="text-white/40 text-sm hover:text-white/60 transition-colors"
           >
-            Sign Out
+            Шығыў
           </button>
         </div>
       </div>
@@ -191,7 +191,7 @@ export default function AdminPage() {
             onChange={(e) =>
               setNewEvent((prev) => ({ ...prev, name: e.target.value }))
             }
-            placeholder="Event name (e.g. Sarah & John's Wedding)"
+            placeholder="Тойдың аты (мысалы: Мийирбек ҳәм Гүл тойы)"
             className="w-full px-4 py-3 rounded-xl bg-dark border border-dark-border text-white placeholder-white/30 focus:outline-none focus:border-gold transition-colors"
             autoFocus
           />
@@ -201,7 +201,7 @@ export default function AdminPage() {
             onChange={(e) =>
               setNewEvent((prev) => ({ ...prev, coupleName: e.target.value }))
             }
-            placeholder="Couple name (e.g. Sarah & John)"
+            placeholder="Жубайлардың аты (мысалы: Мийирбек ҳәм Гүл)"
             className="w-full px-4 py-3 rounded-xl bg-dark border border-dark-border text-white placeholder-white/30 focus:outline-none focus:border-gold transition-colors"
           />
           <input
@@ -218,14 +218,14 @@ export default function AdminPage() {
               disabled={creating || !newEvent.name.trim()}
               className="bg-gold text-dark text-sm font-semibold px-6 py-2 rounded-full hover:bg-gold-light transition-colors disabled:opacity-50"
             >
-              {creating ? "Creating..." : "Create Event"}
+              {creating ? "Жасалып атыр..." : "Той жасаў"}
             </button>
             <button
               type="button"
               onClick={() => setShowCreate(false)}
               className="text-white/40 text-sm hover:text-white/60 transition-colors"
             >
-              Cancel
+              Бийкар етиў
             </button>
           </div>
         </form>
@@ -234,7 +234,7 @@ export default function AdminPage() {
       {/* Event list */}
       {events.length === 0 ? (
         <div className="text-center py-20 text-white/30">
-          <p>No events yet. Create one to get started!</p>
+          <p>Ҳәлиге той жоқ. Жаңа той жасаң!</p>
         </div>
       ) : (
         <div className="space-y-3">
@@ -249,8 +249,8 @@ export default function AdminPage() {
                 {event.coupleName} &bull; {event.date || formatDate(event.createdAt)}
               </p>
               <div className="flex gap-4 mt-2 text-xs text-white/30">
-                <span>{event.photoCount || 0} photos</span>
-                <span>{event.guestCount || 0} guests</span>
+                <span>{event.photoCount || 0} суўрет</span>
+                <span>{event.guestCount || 0} меҳман</span>
               </div>
             </button>
           ))}

@@ -162,7 +162,7 @@ export default function Lightbox({
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img
           src={photo.imageURL}
-          alt={`Photo by ${photo.guestName}`}
+          alt={`${photo.guestName} түсирген суўрет`}
           className="max-w-full max-h-full object-contain"
         />
       </div>

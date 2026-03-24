@@ -169,20 +169,20 @@ export default function AdminEventPage({
       <div className="grid grid-cols-2 gap-3 mb-8">
         <div className="p-4 bg-dark-surface rounded-xl border border-dark-border text-center">
           <p className="text-2xl font-bold text-gold">{photos.length}</p>
-          <p className="text-white/40 text-sm">Photos</p>
+          <p className="text-white/40 text-sm">Суўретлер</p>
         </div>
         <div className="p-4 bg-dark-surface rounded-xl border border-dark-border text-center">
           <p className="text-2xl font-bold text-gold">
             {event?.guestCount || 0}
           </p>
-          <p className="text-white/40 text-sm">Guests</p>
+          <p className="text-white/40 text-sm">Меҳманлар</p>
         </div>
       </div>
 
       {/* QR Code */}
       <div className="mb-8 p-6 bg-dark-surface rounded-xl border border-dark-border">
         <h2 className="text-gold font-semibold text-center mb-4">
-          Guest QR Code
+          Меҳман QR коды
         </h2>
         <QRGenerator url={eventUrl} />
       </div>
@@ -194,27 +194,27 @@ export default function AdminEventPage({
           disabled={downloading || photos.length === 0}
           className="flex-1 bg-gold text-dark text-sm font-semibold py-3 rounded-full hover:bg-gold-light transition-colors disabled:opacity-50"
         >
-          {downloading ? "Downloading..." : `Download All (${photos.length})`}
+          {downloading ? "Жүкленип атыр..." : `Барлығын жүклеў (${photos.length})`}
         </button>
         <a
           href={`/event/${eventId}/gallery`}
           className="flex-1 text-center border border-gold text-gold text-sm font-semibold py-3 rounded-full hover:bg-gold/10 transition-colors"
         >
-          View Gallery
+          Галереяны көриў
         </a>
       </div>
 
       {/* Photos grid */}
       {photos.length > 0 && (
         <div className="mb-8">
-          <h2 className="text-gold font-semibold mb-3">Photos</h2>
+          <h2 className="text-gold font-semibold mb-3">Суўретлер</h2>
           <div className="grid grid-cols-3 gap-1">
             {photos.map((photo) => (
               <div key={photo.id} className="relative group aspect-square">
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img
                   src={photo.thumbnailURL || photo.imageURL}
-                  alt={`Photo by ${photo.guestName}`}
+                  alt={`${photo.guestName} түсирген суўрет`}
                   className="w-full h-full object-cover rounded"
                   loading="lazy"
                 />
@@ -224,7 +224,7 @@ export default function AdminEventPage({
                     disabled={deletingPhoto === photo.id}
                     className="text-red-400 hover:text-red-300 text-xs"
                   >
-                    {deletingPhoto === photo.id ? "..." : "Delete"}
+                    {deletingPhoto === photo.id ? "..." : "Жойыў"}
                   </button>
                 </div>
                 <p className="absolute bottom-0 left-0 right-0 bg-black/60 text-white/60 text-[10px] px-1 py-0.5 truncate rounded-b">
@@ -243,13 +243,12 @@ export default function AdminEventPage({
             onClick={() => setShowDeleteConfirm(true)}
             className="text-red-400/60 text-sm hover:text-red-400 transition-colors"
           >
-            Delete this event
+            Тойды жойыў
           </button>
         ) : (
           <div className="bg-red-900/20 border border-red-800/30 rounded-xl p-4">
             <p className="text-red-400 text-sm mb-3">
-              This will permanently delete the event and all photos. This cannot
-              be undone.
+              Бул той ҳәм барлық суўретлерди мәңгиге жояды. Буны қайтарыў мүмкин емес.
             </p>
             <div className="flex gap-3">
               <button
@@ -257,13 +256,13 @@ export default function AdminEventPage({
                 disabled={deleting}
                 className="bg-red-600 text-white text-sm px-4 py-2 rounded-full hover:bg-red-500 transition-colors disabled:opacity-50"
               >
-                {deleting ? "Deleting..." : "Yes, Delete Everything"}
+                {deleting ? "Жойылып атыр..." : "Аўа, барлығын жойыў"}
               </button>
               <button
                 onClick={() => setShowDeleteConfirm(false)}
                 className="text-white/40 text-sm hover:text-white/60 transition-colors"
               >
-                Cancel
+                Бийкар етиў
               </button>
             </div>
           </div>

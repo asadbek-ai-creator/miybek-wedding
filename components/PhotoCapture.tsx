@@ -368,7 +368,7 @@ export default function PhotoCapture({
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
                 src={upload.thumbnailUrl}
-                alt="Captured"
+                alt="Түсирилди"
                 className="w-full h-full object-cover"
               />
 
@@ -405,13 +405,13 @@ export default function PhotoCapture({
                     }
                     className="text-[9px] text-red-400 font-bold"
                   >
-                    {upload.blob ? "Retry" : "Failed"}
+                    {upload.blob ? "Қайта" : "Қәте"}
                   </button>
                   <button
                     onClick={() => dismissUpload(upload.id)}
                     className="text-[8px] text-white/50"
                   >
-                    Dismiss
+                    Жабыў
                   </button>
                 </div>
               )}
@@ -442,7 +442,7 @@ export default function PhotoCapture({
         <div className="w-10 h-10 flex items-center justify-center">
           {uploads.filter((u) => u.status === "uploading" || u.status === "compressing").length > 0 && (
             <span className="text-[10px] text-gold whitespace-nowrap">
-              {uploads.filter((u) => u.status === "uploading" || u.status === "compressing").length} uploading
+              {uploads.filter((u) => u.status === "uploading" || u.status === "compressing").length} жүкленип атыр
             </span>
           )}
         </div>

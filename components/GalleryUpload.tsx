@@ -264,8 +264,8 @@ export default function GalleryUpload({
 
       setToast(
         successCount === totalCount
-          ? `${successCount} photo${successCount > 1 ? "s" : ""} uploaded!`
-          : `${successCount}/${totalCount} photos uploaded`
+          ? `${successCount} суўрет жүкленди!`
+          : `${successCount}/${totalCount} суўрет жүкленди`
       );
       setTimeout(() => setToast(null), 3000);
     }
@@ -293,7 +293,7 @@ export default function GalleryUpload({
       <button
         onClick={openFilePicker}
         className="w-10 h-10 rounded-lg bg-dark-surface border border-dark-border flex items-center justify-center active:scale-95 transition-transform"
-        aria-label="Upload from gallery"
+        aria-label="Галереядан жүклеў"
       >
         <svg
           className="w-5 h-5 text-white/60"
@@ -327,7 +327,7 @@ export default function GalleryUpload({
               disabled={uploading}
               className="text-white/70 text-sm disabled:opacity-30"
             >
-              Cancel
+              Бийкар етиў
             </button>
             <span className="text-white/60 text-sm">
               {currentIndex + 1} / {photos.length}
@@ -340,7 +340,7 @@ export default function GalleryUpload({
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
               src={current.previewUrl}
-              alt={`Photo ${currentIndex + 1}`}
+              alt={`Суўрет ${currentIndex + 1}`}
               className="max-w-full max-h-full object-contain rounded-lg"
               style={{
                 filter:
@@ -355,7 +355,7 @@ export default function GalleryUpload({
               <div className="absolute inset-0 flex items-center justify-center bg-black/40">
                 <div className="flex flex-col items-center gap-2">
                   <div className="w-8 h-8 border-3 border-white/30 border-t-white rounded-full animate-spin" />
-                  <span className="text-white/80 text-sm">Compressing...</span>
+                  <span className="text-white/80 text-sm">Сығылып атыр...</span>
                 </div>
               </div>
             )}
@@ -366,7 +366,7 @@ export default function GalleryUpload({
                   <span className="text-2xl font-bold text-white">
                     {current.progress}%
                   </span>
-                  <span className="text-white/60 text-sm">Uploading...</span>
+                  <span className="text-white/60 text-sm">Жүкленип атыр...</span>
                 </div>
               </div>
             )}
@@ -392,7 +392,7 @@ export default function GalleryUpload({
             {current.status === "failed" && (
               <div className="absolute inset-0 flex items-center justify-center bg-black/50">
                 <span className="text-red-400 font-semibold">
-                  Upload failed
+                  Жүклеў қәтеси
                 </span>
               </div>
             )}
@@ -492,7 +492,7 @@ export default function GalleryUpload({
                 onClick={closePreview}
                 className="w-full py-3 bg-gold text-black font-semibold rounded-xl text-sm"
               >
-                Done
+                Таяр
               </button>
             ) : (
               <button
@@ -501,8 +501,8 @@ export default function GalleryUpload({
                 className="w-full py-3 bg-gold text-black font-semibold rounded-xl text-sm disabled:opacity-50"
               >
                 {uploading
-                  ? `Uploading... (${photos.filter((p) => p.status === "done").length}/${photos.length})`
-                  : `Upload ${photos.filter((p) => p.status === "pending" || p.status === "failed").length} Photo${photos.filter((p) => p.status === "pending" || p.status === "failed").length !== 1 ? "s" : ""}`}
+                  ? `Жүкленип атыр... (${photos.filter((p) => p.status === "done").length}/${photos.length})`
+                  : `${photos.filter((p) => p.status === "pending" || p.status === "failed").length} суўрет жүклеў`}
               </button>
             )}
           </div>

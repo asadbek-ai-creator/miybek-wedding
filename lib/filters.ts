@@ -5,7 +5,7 @@ export interface Filter {
 }
 
 export const filters: Filter[] = [
-  { id: "normal", name: "Normal", css: "none" },
+  { id: "normal", name: "Оригинал", css: "none" },
   { id: "clarendon", name: "Clarendon", css: "contrast(1.2) saturate(1.35)" },
   { id: "gingham", name: "Gingham", css: "brightness(1.05) hue-rotate(-10deg)" },
   { id: "moon", name: "Moon", css: "grayscale(1) contrast(1.1) brightness(1.1)" },

@@ -42,7 +42,7 @@ export default function Camera({ filterCSS, onStream, videoRef }: CameraProps) {
       setStarted(true);
       setError("");
     } catch {
-      setError("Camera access denied. Please allow camera permissions.");
+      setError("Камераға рухсат берилмеди. Суўретке түсиў ушын камераға рухсат бериң.");
     }
   }, [onStream, videoRef]);
 
@@ -129,8 +129,8 @@ export default function Camera({ filterCSS, onStream, videoRef }: CameraProps) {
               <path strokeLinecap="round" strokeLinejoin="round" d="M16.5 12.75a4.5 4.5 0 11-9 0 4.5 4.5 0 019 0z" />
             </svg>
           </div>
-          <span className="text-gold font-semibold text-lg">Tap to start camera</span>
-          <span className="text-white/40 text-sm">Camera permission required</span>
+          <span className="text-gold font-semibold text-lg">Камераны қосыў ушын басың</span>
+          <span className="text-white/40 text-sm">Камераға рухсат керек</span>
         </button>
       </div>
     );
@@ -148,7 +148,7 @@ export default function Camera({ filterCSS, onStream, videoRef }: CameraProps) {
             onClick={handleStartTap}
             className="mt-4 px-4 py-2 bg-gold/20 text-gold rounded-lg text-sm"
           >
-            Try again
+            Қайта урыныў
           </button>
         </div>
       </div>
@@ -170,7 +170,7 @@ export default function Camera({ filterCSS, onStream, videoRef }: CameraProps) {
       <button
         onClick={toggleCamera}
         className="absolute top-4 right-4 w-10 h-10 bg-black/50 backdrop-blur-sm rounded-full flex items-center justify-center hover:bg-black/70 transition-colors"
-        aria-label="Switch camera"
+        aria-label="Камераны алмастырыў"
       >
         <svg className="w-5 h-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
           <path strokeLinecap="round" strokeLinejoin="round" d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0l3.181 3.183a8.25 8.25 0 0013.803-3.7M4.031 9.865a8.25 8.25 0 0113.803-3.7l3.181 3.182M20.016 4.357v4.992" />

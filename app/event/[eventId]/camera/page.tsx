@@ -22,8 +22,8 @@ export default function CameraPage({
   const [authReady, setAuthReady] = useState(false);
   const [guestName] = useState(() =>
     typeof window !== "undefined"
-      ? sessionStorage.getItem("guestName") || "Guest"
-      : "Guest"
+      ? sessionStorage.getItem("guestName") || "Меҳман"
+      : "Меҳман"
   );
   const [guestUID] = useState(() =>
     typeof window !== "undefined"
@@ -74,7 +74,7 @@ export default function CameraPage({
     return (
       <main className="flex flex-col h-[100dvh] bg-black items-center justify-center">
         <div className="w-6 h-6 border-2 border-gold/30 border-t-gold rounded-full animate-spin mb-3" />
-        <span className="text-white/40 text-sm">Connecting...</span>
+        <span className="text-white/40 text-sm">Қосылып атыр...</span>
       </main>
     );
   }
@@ -85,13 +85,13 @@ export default function CameraPage({
       <div className="flex-shrink-0 flex items-center justify-between px-4 py-2 bg-black/80 backdrop-blur-sm z-10">
         <span className="text-sm text-gold-light/60">{guestName}</span>
         <span className="font-[family-name:var(--font-playfair)] text-gold text-sm font-semibold">
-          Wedding Camera
+          Той Камерасы
         </span>
         <a
           href={`/event/${eventId}/gallery`}
           className="text-sm text-gold hover:text-gold-light transition-colors"
         >
-          Gallery
+          Галерея
         </a>
       </div>
 

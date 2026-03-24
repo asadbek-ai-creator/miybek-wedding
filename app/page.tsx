@@ -28,11 +28,10 @@ export default function Home() {
       </div>
 
       <h1 className="font-[family-name:var(--font-playfair)] text-4xl md:text-5xl font-bold text-gold mb-4">
-        Wedding Camera
+        Той Камерасы
       </h1>
       <p className="text-gold-light/80 text-lg max-w-md mb-12">
-        Capture beautiful moments with filters and share them in a live gallery
-        with everyone.
+        Ҳәр бир сәтти сақлаң — фильтрлер менен суўретке түсиң ҳәм тирик галереяда бөлисиң.
       </p>
 
       <div className="flex flex-col gap-4 w-full max-w-xs">
@@ -40,10 +39,10 @@ export default function Home() {
           href="/admin"
           className="bg-gold text-dark font-semibold py-3 px-6 rounded-full text-center hover:bg-gold-light transition-colors"
         >
-          Host Login
+          Хожайын кириси
         </Link>
         <p className="text-sm text-white/40 mt-4">
-          Guests: scan the QR code at your table to start capturing!
+          Меҳманлар: суўретке түсиў ушын столыңыздағы QR кодты сканерлең!
         </p>
       </div>
     </main>

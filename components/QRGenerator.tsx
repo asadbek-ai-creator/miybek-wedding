@@ -46,7 +46,7 @@ export default function QRGenerator({ url, size = 256 }: QRGeneratorProps) {
         onClick={downloadQR}
         className="text-sm text-gold hover:text-gold-light transition-colors underline"
       >
-        Download QR Code
+        QR кодты жүклеў
       </button>
     </div>
   );

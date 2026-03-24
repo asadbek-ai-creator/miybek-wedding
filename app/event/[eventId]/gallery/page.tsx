@@ -31,10 +31,10 @@ export default function GalleryPage({
             href={`/event/${eventId}/camera`}
             className="text-gold text-sm hover:text-gold-light transition-colors"
           >
-            Camera
+            Камера
           </a>
           <h1 className="font-[family-name:var(--font-playfair)] text-gold font-semibold">
-            {event?.name || "Gallery"}
+            {event?.name || "Галерея"}
           </h1>
           <div className="w-14" />
         </div>

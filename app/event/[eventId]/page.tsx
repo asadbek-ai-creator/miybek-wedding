@@ -83,7 +83,7 @@ export default function EventEntryPage({
       if (snap.exists()) {
         setEvent({ id: snap.id, ...snap.data() } as Event);
       } else {
-        setError("Event not found");
+        setError("Той табылмады");
       }
     });
   }
@@ -117,7 +117,7 @@ export default function EventEntryPage({
 
       router.push(`/event/${eventId}/camera`);
     } catch {
-      setError("Failed to join. Please try again.");
+      setError("Қосылыў мүмкин болмады. Қайта урыныў.");
       setLoading(false);
     }
   };
@@ -172,7 +172,7 @@ export default function EventEntryPage({
                 borderRadius: "4px",
               }}
             >
-              Wedding Celebration
+              ТОЙ МӘРЕСИМИ
             </span>
           </div>
 
@@ -225,7 +225,7 @@ export default function EventEntryPage({
             className="text-center"
             style={{ fontSize: "14px", color: "#aaa", marginBottom: "20px" }}
           >
-            Help us capture every moment
+            Ҳәр бир сәтти бирге сақлайық
           </p>
 
           {/* Form */}
@@ -235,14 +235,14 @@ export default function EventEntryPage({
               className="block mb-2"
               style={{ fontSize: "13px", color: "#999" }}
             >
-              What&apos;s your name?
+              Атыңыз ким?
             </label>
             <input
               id="guestName"
               type="text"
               value={guestName}
               onChange={(e) => setGuestName(e.target.value)}
-              placeholder="Enter your name"
+              placeholder="Атыңызды жазың"
               autoFocus
               maxLength={50}
               className="w-full mb-4 px-4 text-white outline-none transition-colors"
@@ -277,7 +277,7 @@ export default function EventEntryPage({
                 (e.target as HTMLElement).style.filter = "none";
               }}
             >
-              {loading ? "Joining..." : "Start Capturing"}
+              {loading ? "Қосылып атыр..." : "Суўретке түсиў"}
             </button>
           </form>
 
@@ -294,7 +294,7 @@ export default function EventEntryPage({
               fontSize: "13px",
             }}
           >
-            View Gallery
+            Галереяны көриў
           </a>
 
           {/* Bottom text */}
@@ -302,7 +302,7 @@ export default function EventEntryPage({
             className="text-center"
             style={{ fontSize: "11px", color: "#555", marginTop: "12px" }}
           >
-            No app download needed
+            Приложение жүклеў керек емес
           </p>
 
           {error && (
@@ -312,7 +312,7 @@ export default function EventEntryPage({
       ) : (
         <div className="flex flex-col items-center gap-3">
           <div className="w-8 h-8 border-2 border-gold border-t-transparent rounded-full animate-spin" />
-          <span style={{ fontSize: "12px", color: "#555" }}>Loading...</span>
+          <span style={{ fontSize: "12px", color: "#555" }}>Жүкленип атыр...</span>
         </div>
       )}
     </main>

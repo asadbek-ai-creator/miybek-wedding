@@ -128,9 +128,9 @@ export default function Gallery({ eventId }: GalleryProps) {
             d="M2.25 15.75l5.159-5.159a2.25 2.25 0 013.182 0l5.159 5.159m-1.5-1.5l1.409-1.41a2.25 2.25 0 013.182 0l2.909 2.91M3.75 21h16.5a2.25 2.25 0 002.25-2.25V6.75a2.25 2.25 0 00-2.25-2.25H3.75A2.25 2.25 0 001.5 6.75v12a2.25 2.25 0 002.25 2.25z"
           />
         </svg>
-        <p className="text-white/40">No photos yet</p>
+        <p className="text-white/40">Ҳәлиге суўрет жоқ</p>
         <p className="text-white/20 text-sm mt-1">
-          Be the first to capture a moment!
+          Биринши болып суўретке түсиң!
         </p>
       </div>
     );
@@ -159,7 +159,7 @@ export default function Gallery({ eventId }: GalleryProps) {
               // eslint-disable-next-line @next/next/no-img-element
               <img
                 src={photo.thumbnailURL || photo.imageURL}
-                alt={`Photo by ${photo.guestName}`}
+                alt={`${photo.guestName} түсирген суўрет`}
                 className="w-full h-full object-cover fade-in"
                 loading="lazy"
               />
